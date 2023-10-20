@@ -1,0 +1,46 @@
+@page "/JsDemo"
+@inject IJSRuntime JsRuntime
+<h3>JsDemo</h3>
+
+<button class="btn btn-primary" @onclick="HelloWorld">Hello World</button>
+
+<div>
+    <input type="text" @bind-value="Name" />
+    <button class="btn btn-primary" @onclick="HelloWorldParams">Hello Name</button>
+</div>
+
+<div>
+    <button class="btn btn-outline-primary" onclick="CallDotnetName()">Call Dotnet</button>
+</div>
+
+@code {
+    string Name = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var dotnet = DotNetObjectReference.Create(this);
+        await JsRuntime.InvokeVoidAsync("InitDotnet", dotnet);
+    }
+
+    private async Task HelloWorld()
+    {
+        await JsRuntime.InvokeVoidAsync("HelloWorld");
+    }
+    
+    private async Task HelloWorldParams()
+    {
+        await JsRuntime.InvokeVoidAsync("HelloName", Name );
+    }
+
+    [JSInvokable]
+    public void DotnetFromJs()
+    {
+        Console.WriteLine("We called dotnet from JS!");
+    }
+    
+    [JSInvokable]
+    public void DotnetFromJsParams(string name)
+    {
+        Console.WriteLine($"Hello {name}, we called dotnet from JS!");
+    }
+}
